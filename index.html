@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Email Tracking with n8n</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0F172A',   // Slate 900
+                            primary: '#3B82F6', // Blue 500
+                            secondary: '#8B5CF6', // Violet 500
+                            accent: '#F43F5E', // Rose 500
+                            success: '#10B981', // Emerald 500
+                            light: '#F8FAFC', // Slate 50
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Diagram Connectors */
+        .connector-line {
+            width: 2px;
+            background-color: #CBD5E1;
+            flex-grow: 1;
+            min-height: 20px;
+        }
+        
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            z-index: 10;
+        }
+    </style>
+    <!-- Chosen Palette: Modern Tech (Blue/Violet/Rose) -->
+</head>
+<body class="bg-slate-50">
+
+    <!-- HERO SECTION -->
+    <header class="bg-gradient-to-r from-brand-dark to-slate-800 text-white py-20 px-6 relative overflow-hidden">
+        <div class="max-w-6xl mx-auto relative z-10 text-center">
+            <div class="inline-block px-4 py-1 mb-4 rounded-full bg-brand-primary/20 text-brand-primary font-semibold text-sm border border-brand-primary/50">
+                NO-CODE AUTOMATION
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+                The Invisible Observer:<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary">
+                    Automated Email Tracking
+                </span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                Transform Google Sheets into a powerful CRM using n8n. Send personalized emails and track opens in real-time using a hidden 1x1 pixel.
+            </p>
+        </div>
+        <!-- Abstract Decoration -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-brand-primary rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+            <div class="absolute top-0 -right-4 w-96 h-96 bg-brand-secondary rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        </div>
+    </header>
+
+    <!-- CONTENT GRID -->
+    <main class="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 gap-16">
+
+        <!-- SECTION 1: THE ECOSYSTEM (Architecture) -->
+        <section>
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 border-l-4 border-brand-primary pl-4">The Ecosystem</h2>
+                <p class="text-slate-600 text-lg">
+                    Three distinct components work in harmony to create a self-sustaining feedback loop. Google Sheets acts as the brain, n8n as the nervous system, and Gmail as the voice.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Node 1 -->
+                <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-green-500 hover:shadow-xl transition-shadow duration-300">
+                    <div class="text-6xl mb-4">
+                        &#x1F4CA; <!-- Chart/Sheet -->
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Google Sheets</h3>
+                    <p class="text-slate-500 text-sm">
+                        Acts as the Database (CRM). Stores Lead Name, Email, Status, and timestamp logs.
+                    </p>
+                </div>
+                
+                <!-- Connector Desktop -->
+                <div class="hidden md:flex flex-col justify-center items-center text-slate-300 text-4xl">
+                    &#x2194; <!-- Left Right Arrow -->
+                </div>
+
+                <!-- Node 2 -->
+                <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-brand-primary hover:shadow-xl transition-shadow duration-300">
+                    <div class="text-6xl mb-4">
+                        &#x26A1; <!-- High Voltage -->
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">n8n Automation</h3>
+                    <p class="text-slate-500 text-sm">
+                        The Logic Engine. Runs two workflows: one to send mail, one to listen for opens.
+                    </p>
+                </div>
+
+                <!-- Connector Desktop -->
+                <div class="hidden md:flex flex-col justify-center items-center text-slate-300 text-4xl">
+                    &#x2194; <!-- Left Right Arrow -->
+                </div>
+
+                <!-- Node 3 -->
+                <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-red-500 hover:shadow-xl transition-shadow duration-300">
+                    <div class="text-6xl mb-4">
+                        &#x1F4E7; <!-- Envelope -->
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Gmail Client</h3>
+                    <p class="text-slate-500 text-sm">
+                        The Delivery Agent. Sends HTML emails and loads the invisible pixel upon opening.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DATA STRUCTURE (The Database) -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="order-2 lg:order-1">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-slate-200">
+                    <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        <span class="ml-4 text-xs font-mono text-slate-500">leads_db.csv</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500">
+                                <tr>
+                                    <th class="px-6 py-3">Name</th>
+                                    <th class="px-6 py-3">Email</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3">Pixel_ID</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="px-6 py-4">Alice Doe</td>
+                                    <td class="px-6 py-4 font-mono text-xs">alice@ex.com</td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Opened</span></td>
+                                    <td class="px-6 py-4 font-mono text-xs text-brand-secondary">a1b2c3d4...</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="px-6 py-4">Bob Smith</td>
+                                    <td class="px-6 py-4 font-mono text-xs">bob@ex.com</td>
+                                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Sent</span></td>
+                                    <td class="px-6 py-4 font-mono text-xs text-brand-secondary">e5f6g7h8...</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="px-6 py-4">Charlie</td>
+                                    <td class="px-6 py-4 font-mono text-xs">char@ex.com</td>
+                                    <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs">New</span></td>
+                                    <td class="px-6 py-4 font-mono text-xs text-slate-300">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="order-1 lg:order-2">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 border-l-4 border-brand-secondary pl-4">The Schema</h2>
+                <p class="text-slate-600 mb-6">
+                    A robust CRM requires specific data points. The <strong>Status</strong> column drives the workflow logic, preventing duplicate emails. The <strong>Pixel_ID</strong> is the secret key that links a generic web request back to a specific human.
+                </p>
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-start">
+                        <div class="bg-blue-100 p-2 rounded text-brand-primary mr-4">&#x2705;</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Status Tracking</h4>
+                            <p class="text-sm text-slate-500">Moves from 'New' &rarr; 'Sent' &rarr; 'Opened'.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-purple-100 p-2 rounded text-brand-secondary mr-4">&#x1F511;</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Security</h4>
+                            <p class="text-sm text-slate-500">Pixel_ID uses a random hex string to prevent ID guessing.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: WORKFLOW LOGIC (Sender vs Tracker) -->
+        <section>
+            <div class="mb-12 text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">The Logic Engine</h2>
+                <p class="text-slate-600">
+                    Two asynchronous workflows run independently. One pushes information out; the other sits and waits for a signal to return.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- SENDER WORKFLOW -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-8 border-blue-500 relative">
+                    <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider">
+                        Workflow A: The Sender
+                    </div>
+                    
+                    <div class="mt-8 flex flex-col h-full space-y-0">
+                        <!-- Step 1 -->
+                        <div class="flex items-center pb-8 border-l-2 border-blue-100 pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-blue-500 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-blue-500 uppercase">Trigger</span>
+                                <h4 class="font-bold text-slate-800">Cron / Schedule</h4>
+                                <p class="text-sm text-slate-500">Runs every morning at 9:00 AM.</p>
+                            </div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="flex items-center pb-8 border-l-2 border-blue-100 pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-blue-400 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-blue-500 uppercase">Fetch</span>
+                                <h4 class="font-bold text-slate-800">Get Rows (Filter)</h4>
+                                <p class="text-sm text-slate-500">Finds rows where Status = "New".</p>
+                            </div>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="flex items-center pb-8 border-l-2 border-blue-100 pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-blue-300 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-blue-500 uppercase">Generate</span>
+                                <h4 class="font-bold text-slate-800">Crypto Node</h4>
+                                <p class="text-sm text-slate-500">Creates 16-char random ID.</p>
+                            </div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="flex items-center pb-0 border-l-2 border-transparent pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-blue-200 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-blue-500 uppercase">Action</span>
+                                <h4 class="font-bold text-slate-800">Send Gmail</h4>
+                                <p class="text-sm text-slate-500">Injects ID into &lt;img&gt; tag.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRACKER WORKFLOW -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-8 border-purple-500 relative">
+                    <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider">
+                        Workflow B: The Tracker
+                    </div>
+
+                    <div class="mt-8 flex flex-col h-full space-y-0">
+                        <!-- Step 1 -->
+                        <div class="flex items-center pb-8 border-l-2 border-purple-100 pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-purple-500 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-purple-500 uppercase">Trigger</span>
+                                <h4 class="font-bold text-slate-800">Webhook (GET)</h4>
+                                <p class="text-sm text-slate-500">Receives request from email client.</p>
+                            </div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="flex items-center pb-8 border-l-2 border-purple-100 pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-purple-400 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-purple-500 uppercase">Identify</span>
+                                <h4 class="font-bold text-slate-800">Lookup Pixel_ID</h4>
+                                <p class="text-sm text-slate-500">Matches ID from URL to Sheet.</p>
+                            </div>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="flex items-center pb-8 border-l-2 border-purple-100 pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-purple-300 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-purple-500 uppercase">Update</span>
+                                <h4 class="font-bold text-slate-800">Write to Sheet</h4>
+                                <p class="text-sm text-slate-500">Sets Status="Opened", Date=NOW.</p>
+                            </div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="flex items-center pb-0 border-l-2 border-transparent pl-4 relative">
+                            <div class="absolute -left-[9px] top-0 bg-purple-200 w-4 h-4 rounded-full border-2 border-white"></div>
+                            <div>
+                                <span class="text-xs font-bold text-purple-500 uppercase">Response</span>
+                                <h4 class="font-bold text-slate-800">Return Binary</h4>
+                                <p class="text-sm text-slate-500">Sends 1x1 transparent PNG back.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: THE INVISIBLE PIXEL (How it works) -->
+        <section class="bg-slate-800 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden shadow-2xl">
+            <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-4 text-white">The "Spy" Pixel</h2>
+                    <p class="text-slate-300 mb-6 leading-relaxed">
+                        The core of this system is a tiny, 1x1 pixel image embedded in the HTML email. It's invisible to the human eye, but when the email client tries to load it, it must "call home" to your n8n server.
+                    </p>
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+                        <code class="font-mono text-sm text-brand-primary">
+                            &lt;img src="<span class="text-green-400">https://n8n.io/webhook/track</span><span class="text-yellow-400">?id=a1b2...</span>" width="1" height="1" /&gt;
+                        </code>
+                    </div>
+                    <ul class="mt-6 space-y-3">
+                        <li class="flex items-center text-sm text-slate-300">
+                            <span class="text-green-400 mr-2">&#10004;</span>
+                            <span>The <strong>Base URL</strong> triggers the n8n webhook.</span>
+                        </li>
+                        <li class="flex items-center text-sm text-slate-300">
+                            <span class="text-yellow-400 mr-2">&#10004;</span>
+                            <span>The <strong>ID Parameter</strong> identifies the specific user.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="flex justify-center items-center">
+                    <!-- Visual representation of the pixel flow -->
+                    <div class="relative w-64 h-64 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
+                        <div class="absolute inset-0 flex items-center justify-center animate-ping opacity-20">
+                            <div class="w-48 h-48 bg-brand-accent rounded-full"></div>
+                        </div>
+                        <div class="w-1 h-1 bg-brand-accent shadow-[0_0_20px_5px_rgba(244,63,94,0.8)]"></div>
+                        <div class="absolute bottom-10 text-xs text-brand-accent uppercase tracking-widest font-bold">1x1 PIXEL</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: SIMULATED RESULTS (Charts) -->
+        <section>
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4 border-l-4 border-brand-accent pl-4">Simulated Campaign Results</h2>
+                <p class="text-slate-600">
+                    Once implemented, your Google Sheet transforms into a live dashboard. Here is a visualization of what your data could look like after a week of automated nurturing.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Chart 1: Status Distribution -->
+                <div class="bg-white p-6 rounded-xl shadow-md flex flex-col items-center">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4 w-full text-left">Lead Funnel Status</h3>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">
+                        <strong>Insight:</strong> 65% of leads have engaged with the initial email.
+                    </p>
+                </div>
+
+                <!-- Chart 2: Opens Over Time -->
+                <div class="bg-white p-6 rounded-xl shadow-md flex flex-col items-center md:col-span-2">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4 w-full text-left">Engagement Timeline (7 Days)</h3>
+                    <div class="chart-container" style="max-width: 100%;">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">
+                        <strong>Insight:</strong> Peak engagement occurs within 2 hours of the 9:00 AM send time.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="mt-12 py-12 border-t border-slate-200 text-center">
+            <h3 class="text-2xl font-bold text-slate-800 mb-4">Ready to Automate?</h3>
+            <p class="text-slate-500 mb-8 max-w-lg mx-auto">
+                Stop guessing who reads your emails. Build this workflow in n8n today and turn your cold leads into warm conversations.
+            </p>
+            <div class="text-sm text-slate-400">
+                Generated based on the "n8n Email Tracking Guide"
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Chart.js Logic -->
+    <script>
+        // Common Tooltip Configuration as per requirement
+        const tooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // Label Wrapping Utility
+        function wrapLabel(str, maxChars) {
+            if (str.length <= maxChars) return str;
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if (currentLine.length + 1 + words[i].length <= maxChars) {
+                    currentLine += ' ' + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // --- Chart 1: Status Distribution (Doughnut) ---
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+        const rawLabelsStatus = ['New Leads (Unsent)', 'Sent (Pending)', 'Opened (Engaged)'];
+        const processedLabelsStatus = rawLabelsStatus.map(l => wrapLabel(l, 16));
+
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: processedLabelsStatus,
+                datasets: [{
+                    data: [15, 20, 65], // Simulated %
+                    backgroundColor: [
+                        '#CBD5E1', // Slate 300 (New)
+                        '#3B82F6', // Brand Primary (Sent)
+                        '#10B981'  // Success Green (Opened)
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: tooltipConfig,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: 'Inter', size: 12 },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Chart 2: Engagement Timeline (Line) ---
+        const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
+        const labelsTimeline = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        
+        new Chart(ctxTimeline, {
+            type: 'line',
+            data: {
+                labels: labelsTimeline,
+                datasets: [
+                    {
+                        label: 'Emails Sent',
+                        data: [45, 50, 48, 52, 60, 20, 15],
+                        borderColor: '#3B82F6', // Blue
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Tracking Pixels Fired',
+                        data: [30, 35, 32, 40, 45, 12, 10],
+                        borderColor: '#F43F5E', // Rose (Accent)
+                        backgroundColor: 'rgba(244, 63, 94, 0.0)',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: tooltipConfig,
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            font: { family: 'Inter', size: 12 },
+                            usePointStyle: true
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#F1F5F9'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
